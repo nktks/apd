@@ -10,7 +10,7 @@ import (
 
 var (
 	forceFrom = flag.String("f", "", "from key for force specifing")
-	forceTo   = flag.String("t", "", "to keyfor force specifing")
+	forceTo   = flag.String("t", "", "to key for force specifing")
 	path      = flag.String("p", "", "path to input file")
 )
 

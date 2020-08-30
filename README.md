@@ -15,7 +15,7 @@ Usage of apd:
   -p string
     	path to input file
   -t string
-    	to keyfor force specifing
+    	to key for force specifing
 you can specify input from STDIN or -p input file path.
 ```
 # Example
@@ -66,6 +66,7 @@ $ gcloud dataflow jobs list --sort-by="~CREATION_TIME" --filter="name~some_name"
     "type": "Batch"
   }
 ]
+```
 
 ```
 $ mysql -u root test -e "select * from master_xxx"
