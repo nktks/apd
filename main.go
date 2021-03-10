@@ -1,11 +1,14 @@
 package main
 
 import (
+	"encoding/json"
 	"flag"
 	"fmt"
 	"io/ioutil"
 	"log"
 	"os"
+
+	"gopkg.in/yaml.v2"
 )
 
 var (
@@ -21,42 +24,51 @@ func main() {
 		fmt.Println("you can specify input from STDIN or -p input file path.")
 	}
 	flag.Parse()
-	var input string
+	var input []byte
 	if *path != "" {
 		b, err := ioutil.ReadFile(*path)
 		if err != nil {
 			log.Fatalf("Read from file failed: %v", err)
 		}
-		input = string(b)
+		input = b
 	} else {
 		b, err := readStdin()
 		if err != nil {
 			log.Fatalf("Read from stdin failed: %v", err)
 		}
-		input = string(b)
+		input = b
 	}
-	if input == "" {
+	sinput := string(input)
+	if sinput == "" {
 		flag.Usage()
 		return
 	}
 
 	kf := NewKeyFinder(*forceFrom, *forceTo)
 	// json is subset of yaml. so first try to parse as json
-	appended, jerr := Append(kf, &JSONMarshaler{}, input)
-	if jerr != nil {
-		ry, yerr := Append(kf, &YAMLMarshaler{}, input)
-		if yerr != nil {
-			rc, cerr := AppendCSV(kf, input)
-			if cerr != nil {
-				log.Printf("json unmarshal error: %v", jerr)
-				log.Printf("yaml unmarshal error: %v", yerr)
-				log.Printf("csv reader error: %v", cerr)
-				log.Fatal("cant parse input by json, yaml, csv parser")
-			}
-			appended = rc
-		} else {
-			appended = ry
+	var test interface{}
+	var appended string
+	if jerr := json.Unmarshal(input, &test); jerr == nil {
+		jr, err := Append(kf, &JSONMarshaler{}, sinput)
+		if err != nil {
+			log.Fatalf("cant append json. %v", err)
 		}
+		appended = jr
+	} else if yerr := yaml.Unmarshal(input, &test); yerr == nil {
+		yr, err := Append(kf, &YAMLMarshaler{}, sinput)
+		if err != nil {
+			log.Fatalf("cant append yaml. %v", err)
+		}
+		appended = yr
+	} else {
+		cr, err := AppendCSV(kf, sinput)
+		if err != nil {
+			log.Printf("json unmarshal error: %v", jerr)
+			log.Printf("yaml unmarshal error: %v", yerr)
+			log.Printf("csv reader error: %v", err)
+			log.Fatal("cant parse input by json, yaml, csv parser")
+		}
+		appended = cr
 	}
 	fmt.Print(appended)
 
