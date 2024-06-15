@@ -9,9 +9,14 @@ Append duration to input texts.
 ```
 # Usage
 ```
-Usage of apd:
+go run github.com/nktks/apd -h
+Usage of /var/folders/gd/h18cn4_93ddgl31cs5nsdb500000gp/T/go-build1025992720/b001/exe/apd:
   -f string
     	from key for force specifing
+  -if int
+    	from csv index for force specifing (default -1)
+  -it int
+    	to csv index for force specifing (default -1)
   -p string
     	path to input file
   -t string
@@ -66,6 +71,15 @@ $ gcloud dataflow jobs list --sort-by="~CREATION_TIME" --filter="name~some_name"
     "type": "Batch"
   }
 ]
+```
+```
+gcloud dataflow jobs list --sort-by="~CREATION_TIME" --filter="name~some-name" --region=asia-northeast1 --format="value(name,creationTime,stateTime)" --limit=2
+some-name-20240615040031	2024-06-15 04:00:33	2024-06-15 04:00:45
+some-name-20240615020031	2024-06-15 02:00:33	2024-06-15 03:26:14
+
+gcloud dataflow jobs list --sort-by="~CREATION_TIME" --filter="name~some-name" --region=asia-northeast1 --format="value(name,creationTime,stateTime)" --limit=2 | go run github.com/nktks/apd -if 1 -it 2
+some-name-20240615040031	2024-06-15 04:00:33	2024-06-15 04:00:45	12s
+some-name-20240615020031	2024-06-15 02:00:33	2024-06-15 03:26:14	1h25m41s
 ```
 
 ```
