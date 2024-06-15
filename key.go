@@ -9,6 +9,7 @@ var (
 		"starttime",
 		"start",
 		"startedat",
+		"startat",
 		"from",
 		"fromat",
 		"fromtime",
@@ -19,7 +20,10 @@ var (
 		"completedtime",
 		"completedat",
 		"end",
+		"endedat",
 		"endat",
+		"closeat",
+		"closedat",
 		"endtime",
 		"to",
 	}
