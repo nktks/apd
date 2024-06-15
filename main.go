@@ -58,19 +58,21 @@ func main() {
 	// json is subset of yaml. so first try to parse as json
 	var test interface{}
 	var appended string
-	if jerr := json.Unmarshal(input, &test); jerr == nil {
+	var jerr, yerr, aerr error
+	if jerr = json.Unmarshal(input, &test); jerr == nil {
 		jr, err := Append(kf, &JSONMarshaler{}, sinput)
 		if err != nil {
-			log.Fatalf("cant append json. %v", err)
+			aerr = fmt.Errorf("cant append json. %v", err)
 		}
 		appended = jr
-	} else if yerr := yaml.Unmarshal(input, &test); yerr == nil {
+	} else if yerr = yaml.Unmarshal(input, &test); yerr == nil {
 		yr, err := Append(kf, &YAMLMarshaler{}, sinput)
 		if err != nil {
-			log.Fatalf("cant append yaml. %v", err)
+			aerr = fmt.Errorf("cant append yaml. %v", err)
 		}
 		appended = yr
-	} else {
+	}
+	if aerr != nil {
 		cr, err := AppendCSV(kf, sinput, *forceIndexFrom, *forceIndexTo)
 		if err != nil {
 			log.Printf("json unmarshal error: %v", jerr)
