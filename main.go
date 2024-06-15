@@ -55,7 +55,8 @@ func main() {
 	}
 
 	kf := NewKeyFinder(*forceFrom, *forceTo)
-	// json is subset of yaml. so first try to parse as json
+	// in this tool, we assume json is subset of yaml in almost case.
+	// so first try to parse as json.
 	var test interface{}
 	var appended string
 	var jerr, yerr, aerr error
