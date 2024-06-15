@@ -10,7 +10,7 @@ import (
 	"github.com/araddon/dateparse"
 )
 
-func AppendCSV(kf *KeyFinder, input string) (string, error) {
+func AppendCSV(kf *KeyFinder, input string, forceIndexFrom, forceIndexTo int) (string, error) {
 
 	sr := strings.NewReader(input)
 	r := csv.NewReader(sr)
@@ -20,8 +20,11 @@ func AppendCSV(kf *KeyFinder, input string) (string, error) {
 	if err != nil {
 		return "", err
 	}
+	if len(records) == 0 {
+		return "", nil
+	}
 	tsv := false
-	if len(records) > 0 && strings.Contains(records[0][0], "\t") {
+	if strings.Contains(records[0][0], "\t") {
 		tsv = true
 		sr = strings.NewReader(input)
 		r = csv.NewReader(sr)
@@ -35,7 +38,19 @@ func AppendCSV(kf *KeyFinder, input string) (string, error) {
 	fromFound := false
 	toIndex := 0
 	toFound := false
-	if len(records) > 0 {
+	withHeader := true
+	if forceIndexFrom >= 0 {
+		fromIndex = forceIndexFrom
+		toIndex = forceIndexTo
+		withHeader = false
+		if len(records[0]) > fromIndex {
+			fromFound = true
+		}
+		if len(records[0]) > toIndex {
+			toFound = true
+		}
+	}
+	if withHeader {
 		fromIndex, fromFound = kf.DetectFromIndex(records[0])
 		toIndex, toFound = kf.DetectToIndex(records[0])
 		if fromFound && toFound {
@@ -44,7 +59,7 @@ func AppendCSV(kf *KeyFinder, input string) (string, error) {
 	}
 
 	for i, r := range records {
-		if i == 0 {
+		if i == 0 && withHeader {
 			continue
 		}
 		if !fromFound || !toFound {

@@ -11,10 +11,16 @@ import (
 	"gopkg.in/yaml.v2"
 )
 
+const (
+	NoIndex = -1
+)
+
 var (
-	forceFrom = flag.String("f", "", "from key for force specifing")
-	forceTo   = flag.String("t", "", "to key for force specifing")
-	path      = flag.String("p", "", "path to input file")
+	forceFrom      = flag.String("f", "", "from key for force specifing")
+	forceTo        = flag.String("t", "", "to key for force specifing")
+	path           = flag.String("p", "", "path to input file")
+	forceIndexFrom = flag.Int("if", NoIndex, "from csv index for force specifing")
+	forceIndexTo   = flag.Int("it", NoIndex, "to csv index for force specifing")
 )
 
 func main() {
@@ -43,6 +49,10 @@ func main() {
 		flag.Usage()
 		return
 	}
+	if (*forceIndexFrom == NoIndex && *forceIndexTo != NoIndex) || (*forceIndexFrom != NoIndex && *forceIndexTo == NoIndex) {
+		flag.Usage()
+		return
+	}
 
 	kf := NewKeyFinder(*forceFrom, *forceTo)
 	// json is subset of yaml. so first try to parse as json
@@ -61,7 +71,7 @@ func main() {
 		}
 		appended = yr
 	} else {
-		cr, err := AppendCSV(kf, sinput)
+		cr, err := AppendCSV(kf, sinput, *forceIndexFrom, *forceIndexTo)
 		if err != nil {
 			log.Printf("json unmarshal error: %v", jerr)
 			log.Printf("yaml unmarshal error: %v", yerr)
