@@ -5,7 +5,7 @@ Append duration to input texts.
 # How to install
 ## by go get
 ```
-# go get github.com/nakatamixi/apd
+# go get github.com/nktks/apd
 ```
 # Usage
 ```
